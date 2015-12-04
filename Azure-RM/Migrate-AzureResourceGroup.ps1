@@ -1,5 +1,3 @@
-cls;
-
 function Migrate-AzureResourceGroup {
 <#
 .SYNOPSIS
