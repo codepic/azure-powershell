@@ -26,30 +26,38 @@ function Migrate-AzureResourceGroup {
 
     Process {
 
+		# Try to find AzureRM module
         if (Get-Module -ListAvailable -Name AzureRM) {
-            Import-Module AzureRM
+            Import-Module AzureRM 
         } else {
+			# Install if not found
             Install-Module AzureRM
         }
 
+		# Try to find AzureRM.Resouces module
         if (Get-Module -ListAvailable -Name AzureRM.Resources) {
             Import-Module AzureRM.Resources
         } else {
+			# Install if not found
             Install-Module AzureRM.Resources
         }
 
+		# Check if we're logged on
         try{
             Get-AzureRmContext | Out-Null
         } catch {
+			# Request login if not yet authenticated
             Login-AzureRmAccount -ErrorAction Stop
         }
 
-
+		# Do the actual work
         Find-AzureRmResource -Verbose | 
             Where-Object {
+				# Filter by FromGroupName param
                 $_.ResourceGroupName -eq $FromGroupName
             } |
             ForEach-Object {
+				# Move found resources
                 Move-AzureRmResource -DestinationResourceGroupName $ToGroupName -ResourceId $_.ResourceId
             }
 
